@@ -7,7 +7,7 @@ import {
 } from "./urls";
 
 const getAllUser = () => http.get(apiGetAllUser);
-const getUserById = (id) => http.get(`${apiGetUserById}/${id}` + id);
+const getUserById = (id) => http.get(`${apiGetUserById}/${id}`);
 const updateUser = (body) => http.put(`${apiUpdateUser}/${body.id}`, body);
 const deleteUser = (id) => http.delete(`${apiDeleteUser}/${id}`);
 
