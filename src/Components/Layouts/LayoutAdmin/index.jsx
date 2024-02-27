@@ -1,8 +1,8 @@
 import { Col, Menu, Row } from "antd";
-import React, { useState, useEffect } from "react";
-import MenuItems from "./MenuItems";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import MenuItems from "./MenuItems";
+import "./styles.css";
 const LayoutAdmin = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
