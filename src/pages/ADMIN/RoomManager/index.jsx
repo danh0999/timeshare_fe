@@ -4,37 +4,39 @@ import {
   PlusCircleOutlined,
 } from "@ant-design/icons";
 import { Button, Col, Dropdown, Input, Menu, Row, Spin, Table } from "antd";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
 import LayoutAdmin from "../../../Components/Layouts/LayoutAdmin";
 import Notice from "../../../Components/Notice";
-import UserService from "../../../services/UserService";
+import RoomService from "../../../services/RoomService";
 import "../UserManager/styles.css";
 import ModalUpdate from "./components/ModalUpdate";
+import { formatMoney } from "../../../lib/utils";
 const { Search } = Input;
-const TimeShare = () => {
+const RoomManager = () => {
   const [loading, setLoading] = useState(false);
   const [openModalUpdate, setOpenModalUpdate] = useState(false);
-  const [listUser, setListUser] = useState([]);
+  const [listData, setListData] = useState([]);
   const handleGetList = async () => {
     try {
       setLoading(true);
-      const res = await UserService.getAllUser();
+      const res = await RoomService.getAllRoom();
       if (!res.isSucceed) return;
-      setListUser(res.result);
+      setListData(res.result);
     } catch (err) {
       console.log("err: ", err);
     } finally {
       setLoading(false);
     }
   };
-  const handleDeleteTimeShare = async (id) => {
+  const handleDeleteRoom = async (id) => {
     try {
       setLoading(true);
-      const res = await UserService.deleteUser(id);
+      const res = await RoomService.deleteRoom(id);
       if (!res.isSucceed) return;
       handleGetList();
       Notice({
-        msg: "Delete User Success!",
+        msg: "Delete Room Success!",
       });
     } catch (err) {
       console.log("err: ", err);
@@ -57,38 +59,35 @@ const TimeShare = () => {
     },
     {
       title: "Dates",
-      dataIndex: "userName",
-      key: "userName",
+      dataIndex: "checkin",
+      key: "checkin",
+      render: (val, record) => (
+        <div>
+          {val ? moment(val).format("DD/MM/YY") : ""} -{" "}
+          {record?.checkout ? moment(record?.checkout).format("DD/MM/YY") : ""}
+        </div>
+      ),
     },
     {
-      title: "Night",
-      dataIndex: "name",
-      key: "name",
+      title: "Nights",
+      dataIndex: "nights",
+      key: "nights",
     },
     {
       title: "Price",
-      dataIndex: "email",
-      key: "email",
+      dataIndex: "price",
+      key: "price",
+      render: (val) => (val ? formatMoney(val) : 0),
     },
     {
       title: "Room",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
+      dataIndex: "rooms",
+      key: "rooms",
     },
     {
       title: "Sleeps",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
-    },
-    {
-      title: "Building",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
-    },
-    {
-      title: "View",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
+      dataIndex: "sleeps",
+      key: "sleeps",
     },
     {
       title: "Action",
@@ -107,17 +106,17 @@ const TimeShare = () => {
                 }}
               >
                 <EditOutlined />
-                <span style={{ marginLeft: 8 }}>Update TimeShare</span>
+                <span style={{ marginLeft: 8 }}>Update Room</span>
               </Menu.Item>
               <Menu.Item
                 key="5"
                 style={{ color: "#ED1117" }}
                 onClick={() => {
-                  handleDeleteTimeShare(record.id);
+                  handleDeleteRoom(record.roomID);
                 }}
               >
                 <DeleteOutlined />
-                <span style={{ marginLeft: 8 }}>Delete TimeShare</span>
+                <span style={{ marginLeft: 8 }}>Delete Room</span>
               </Menu.Item>
             </Menu>
           }
@@ -145,7 +144,7 @@ const TimeShare = () => {
                 style={{ width: "100%" }}
               />
             </Col>
-            {/* <Col style={{ width: 100 }}>
+            <Col style={{ width: 100 }}>
               <Button
                 type="primary"
                 icon={<PlusCircleOutlined />}
@@ -154,11 +153,11 @@ const TimeShare = () => {
                   setOpenModalUpdate(true);
                 }}
               >
-               
+                Add Room
               </Button>
-            </Col> */}
+            </Col>
             <Col span={24}>
-              <Table columns={columns} dataSource={listUser} />
+              <Table columns={columns} dataSource={listData} />
             </Col>
           </Row>
         </div>
@@ -176,4 +175,4 @@ const TimeShare = () => {
   );
 };
 
-export default TimeShare;
+export default RoomManager;

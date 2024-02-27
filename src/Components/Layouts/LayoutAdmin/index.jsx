@@ -32,6 +32,7 @@ const LayoutAdmin = ({ children }) => {
             width: 0,
             height: "calc(100vh - 50px)",
             overflowY: "auto",
+            overflowX: "hidden",
           }}
         >
           {children}
