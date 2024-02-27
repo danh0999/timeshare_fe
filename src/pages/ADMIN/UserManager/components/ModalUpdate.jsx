@@ -10,13 +10,7 @@ const ModalUpdate = ({ open, onOk, onCancel }) => {
   const isUpdate = open.isUpdate;
 
   useEffect(() => {
-    if (isUpdate)
-      form.setFieldsValue({
-        name: open.name,
-        email: open.email,
-        phoneNumber: open.phoneNumber,
-      });
-    // handleGetDetail();
+    if (isUpdate) handleGetDetail();
   }, [isUpdate]);
 
   const handleGetDetail = async () => {
@@ -25,9 +19,9 @@ const ModalUpdate = ({ open, onOk, onCancel }) => {
       const res = await UserService.getUserById(open.id);
       if (!res.isSucceed) return;
       form.setFieldsValue({
-        name: res.name,
-        email: res.email,
-        phoneNumber: res.phoneNumber,
+        name: res.result?.name,
+        email: res.result?.email,
+        phoneNumber: res.result?.phoneNumber,
       });
     } finally {
       setLoading(false);

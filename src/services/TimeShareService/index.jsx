@@ -14,11 +14,11 @@ const updateTimeshare = (body) =>
   http.put(`${apiUpdateTimeshare}/${body.id}`, body);
 const deleteTimeshare = (id) => http.delete(`${apiDeleteTimeshare}/${id}`);
 
-const UserService = {
+const TimeShareService = {
   getAllTimeshare,
   getTimeshareById,
   createTimeshare,
   updateTimeshare,
   deleteTimeshare,
 };
-export default UserService;
+export default TimeShareService;

@@ -1,33 +1,35 @@
 import { CloseCircleOutlined, SaveOutlined } from "@ant-design/icons";
-import { Button, Form, Input, Modal, Space } from "antd";
+import { Button, Form, Input, Modal, Space, Upload } from "antd";
 import React, { useState, useEffect } from "react";
-import UserService from "../../../../services/UserService";
 import Notice from "../../../../Components/Notice";
+import TimeShareService from "../../../../services/TimeShareService";
+import { getBase64, normFile } from "../../../../lib/utils";
 
 const ModalUpdate = ({ open, onOk, onCancel }) => {
+  console.log("open: ", open);
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
+  const [image, setImage] = useState(false);
   const isUpdate = open.isUpdate;
 
   useEffect(() => {
-    if (isUpdate)
-      form.setFieldsValue({
-        name: open.name,
-        email: open.email,
-        phoneNumber: open.phoneNumber,
-      });
-    // handleGetDetail();
+    if (isUpdate) handleGetDetail();
   }, [isUpdate]);
 
   const handleGetDetail = async () => {
     try {
       setLoading(true);
-      const res = await UserService.getUserById(open.id);
+      const res = await TimeShareService.getTimeshareById(open.timeshareId);
       if (!res.isSucceed) return;
       form.setFieldsValue({
-        name: res.name,
-        email: res.email,
-        phoneNumber: res.phoneNumber,
+        address: res.result?.address,
+        price: res.result?.price,
+        timeshareName: res.result?.timeshareName,
+        ListImg: [
+          {
+            url: res.result?.image,
+          },
+        ],
       });
     } finally {
       setLoading(false);
@@ -37,15 +39,23 @@ const ModalUpdate = ({ open, onOk, onCancel }) => {
     try {
       setLoading(true);
       const values = await form.validateFields();
-      const res = await UserService[isUpdate ? "updateUser" : ""]({
+      let resFile;
+      if (values?.ListImg?.length > 0) {
+        resFile = await getBase64(values?.ListImg[0]?.originFileObj);
+      }
+      const res = await TimeShareService[
+        isUpdate ? "updateTimeshare" : "createTimeshare"
+      ]({
         ...values,
-        id: open.id,
+        image: resFile ? resFile : open?.image,
+        ListImg: undefined,
+        id: open.timeshareId,
       });
       if (!res.isSucceed) return;
       onCancel();
       onOk();
       Notice({
-        msg: isUpdate ? "Update User Success!" : "Add User Success!",
+        msg: isUpdate ? "Update Timeshare Success!" : "Add Timeshare Success!",
       });
     } finally {
       setLoading(false);
@@ -53,7 +63,7 @@ const ModalUpdate = ({ open, onOk, onCancel }) => {
   };
   return (
     <Modal
-      title={isUpdate ? "Update User" : "Add User"}
+      title={isUpdate ? "Update Timeshare" : "Add Timeshare"}
       open={open}
       onOk={onOk}
       onCancel={onCancel}
@@ -76,53 +86,58 @@ const ModalUpdate = ({ open, onOk, onCancel }) => {
     >
       <Form form={form} layout="vertical">
         <Form.Item
-          label="FullName"
-          name="name"
+          label="TimeShare Name"
+          name="timeshareName"
           rules={[
             {
               required: true,
-              message: "Please input your FullName!",
+              message: "Please input your TimeShare Name!",
             },
           ]}
         >
           <Input placeholder="input name..." />
         </Form.Item>
         <Form.Item
-          label="Email"
-          name="email"
+          label="Price"
+          name="price"
           rules={[
             {
               required: true,
-              message: "Please input your email!",
+              message: "Please input your price!",
             },
           ]}
         >
-          <Input placeholder="input email..." />
+          <Input placeholder="input price..." />
         </Form.Item>
         <Form.Item
-          label="Phone Number"
-          name="phoneNumber"
+          label="Address"
+          name="address"
           rules={[
             {
               required: true,
-              message: "Please input your phone number!",
+              message: "Please input your address!",
             },
           ]}
         >
-          <Input placeholder="input phone number..." />
+          <Input placeholder="input price..." />
         </Form.Item>
-        {/* <Form.Item
-          label="Password"
-          name="password"
-          rules={[
-            {
-              required: true,
-              message: "Please input your password!",
-            },
-          ]}
+        <Form.Item
+          label="Image"
+          name="ListImg"
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
         >
-          <Input.Password placeholder="input password..." />
-        </Form.Item> */}
+          <Upload
+            accept="image/*"
+            multiple={false}
+            listType="picture-card"
+            beforeUpload={() => false}
+            // fileList={fileList}
+            // onChange={onChange}
+          >
+            Upload
+          </Upload>
+        </Form.Item>
       </Form>
     </Modal>
   );

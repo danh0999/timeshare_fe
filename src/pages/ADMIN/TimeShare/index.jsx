@@ -3,13 +3,24 @@ import {
   EditOutlined,
   PlusCircleOutlined,
 } from "@ant-design/icons";
-import { Button, Col, Dropdown, Input, Menu, Row, Spin, Table } from "antd";
+import {
+  Button,
+  Col,
+  Dropdown,
+  Image,
+  Input,
+  Menu,
+  Row,
+  Spin,
+  Table,
+} from "antd";
 import React, { useEffect, useState } from "react";
 import LayoutAdmin from "../../../Components/Layouts/LayoutAdmin";
 import Notice from "../../../Components/Notice";
-import UserService from "../../../services/UserService";
 import "../UserManager/styles.css";
 import ModalUpdate from "./components/ModalUpdate";
+import TimeShareService from "../../../services/TimeShareService";
+import { FAILBACK } from "../../../constants/constants";
 const { Search } = Input;
 const TimeShare = () => {
   const [loading, setLoading] = useState(false);
@@ -18,7 +29,7 @@ const TimeShare = () => {
   const handleGetList = async () => {
     try {
       setLoading(true);
-      const res = await UserService.getAllUser();
+      const res = await TimeShareService.getAllTimeshare();
       if (!res.isSucceed) return;
       setListUser(res.result);
     } catch (err) {
@@ -30,7 +41,7 @@ const TimeShare = () => {
   const handleDeleteTimeShare = async (id) => {
     try {
       setLoading(true);
-      const res = await UserService.deleteUser(id);
+      const res = await TimeShareService.deleteUser(id);
       if (!res.isSucceed) return;
       handleGetList();
       Notice({
@@ -56,39 +67,27 @@ const TimeShare = () => {
       render: (_, record, index) => index + 1,
     },
     {
-      title: "Dates",
-      dataIndex: "userName",
-      key: "userName",
+      title: "TimeShare Name",
+      dataIndex: "timeshareName",
+      key: "timeshareName",
     },
     {
-      title: "Night",
-      dataIndex: "name",
-      key: "name",
+      title: "Image",
+      dataIndex: "image",
+      key: "image",
+      render: (val) => (
+        <Image src={val} alt="" fallback={FAILBACK} style={{ width: 80 }} />
+      ),
     },
     {
       title: "Price",
-      dataIndex: "email",
-      key: "email",
+      dataIndex: "price",
+      key: "price",
     },
     {
-      title: "Room",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
-    },
-    {
-      title: "Sleeps",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
-    },
-    {
-      title: "Building",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
-    },
-    {
-      title: "View",
-      dataIndex: "phoneNumber",
-      key: "phoneNumber",
+      title: "Address",
+      dataIndex: "address",
+      key: "address",
     },
     {
       title: "Action",
@@ -113,7 +112,7 @@ const TimeShare = () => {
                 key="5"
                 style={{ color: "#ED1117" }}
                 onClick={() => {
-                  handleDeleteTimeShare(record.id);
+                  handleDeleteTimeShare(record.timeshareId);
                 }}
               >
                 <DeleteOutlined />
@@ -145,7 +144,7 @@ const TimeShare = () => {
                 style={{ width: "100%" }}
               />
             </Col>
-            {/* <Col style={{ width: 100 }}>
+            <Col style={{ width: 160 }}>
               <Button
                 type="primary"
                 icon={<PlusCircleOutlined />}
@@ -154,9 +153,9 @@ const TimeShare = () => {
                   setOpenModalUpdate(true);
                 }}
               >
-               
+                Add TimeShare
               </Button>
-            </Col> */}
+            </Col>
             <Col span={24}>
               <Table columns={columns} dataSource={listUser} />
             </Col>
